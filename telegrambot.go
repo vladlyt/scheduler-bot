@@ -38,7 +38,8 @@ func getClassTimeReminder(class int) (int, int) {
 	case 6:
 		return 18, 15
 	case 7:
-		return 20, 5
+		return 20, 17
+		//return 20, 5
 	default:
 		return 0, 0
 	}
@@ -97,14 +98,21 @@ func getReminderFromCommand(msg *tgbotapi.Message) (*Reminder, error) {
 	if err != nil || class < 0 || class > 7 {
 		return nil, errors.New("Class must be an integer 1-7")
 	}
-	if msg.ReplyToMessage == nil {
+	if msg.ReplyToMessage == nil || msg.ForwardFrom == nil {
 		return nil, errors.New("Use reply on message")
+	}
+
+	msgID := 0
+	if msg.ReplyToMessage != nil {
+		msgID = msg.ReplyToMessage.MessageID
+	} else {
+		msgID = msg.ForwardFromMessageID
 	}
 	return &Reminder{
 		Weekday:   weekday,
 		Class:     class,
 		ChatId:    msg.Chat.ID,
-		MessageID: msg.MessageID,
+		MessageID: msgID,
 	}, nil
 }
 
