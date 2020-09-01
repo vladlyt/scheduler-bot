@@ -23,6 +23,11 @@ type Reminder struct {
 	MessageID int
 }
 
+func init() {
+	os.Setenv("TZ", "Europe/Kiev")
+}
+
+
 func getClassTimeReminder(class int) (int, int) {
 	switch class {
 	case 1:
@@ -38,7 +43,7 @@ func getClassTimeReminder(class int) (int, int) {
 	case 6:
 		return 18, 15
 	case 7:
-		return 20, 24
+		return 20, 32
 		//return 20, 5
 	default:
 		return 0, 0
@@ -73,7 +78,7 @@ func sendReminder(bot *tgbotapi.BotAPI, reminder *Reminder) {
 		classM,
 		0,
 		0,
-		time.FixedZone("Ukraine", 3),
+		t.Location(),
 	)
 
 	bot.Send(
