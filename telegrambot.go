@@ -98,7 +98,10 @@ func telegramBot(bot *tgbotapi.BotAPI) {
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServe("0.0.0.0:"+os.Getenv("PORT"), nil)
 
+
+	fmt.Println("Starting my master...")
 	for update := range updates {
+		fmt.Println("Message", update.Message.Text)
 		if update.Message == nil {
 			continue
 		}
