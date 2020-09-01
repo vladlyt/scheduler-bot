@@ -82,10 +82,9 @@ func SendMessage(bot *tgbotapi.BotAPI, reminder Reminder) {
 }
 
 func telegramBot(bot *tgbotapi.BotAPI) {
-
-	_, err := bot.SetWebhook(tgbotapi.NewWebhook(
-		os.Getenv("DOMAIN") + os.Getenv("PORT") + "/" + bot.Token,
-	))
+	webhookEndpoint := fmt.Sprintf("%s:%s/%s", os.Getenv("DOMAIN"), os.Getenv("PORT"), bot.Token)
+	fmt.Println("webhookEndpoint", webhookEndpoint)
+	_, err := bot.SetWebhook(tgbotapi.NewWebhook(webhookEndpoint))
 	if err != nil {
 		log.Fatal(err)
 	}
