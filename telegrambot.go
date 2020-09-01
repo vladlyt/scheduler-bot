@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/Syfaro/telegram-bot-api"
+	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -14,6 +16,7 @@ Send this command with reply of message.
 Expected usage of this command: /store {day [1-7]} {class [1-7]}.
 For example: /store 1 2 (Set reply message on Monday at 2 class).
 `
+const PORT = "8443"
 
 func getClassTimeReminder(class int) (int, int) {
 	switch class {
@@ -68,7 +71,7 @@ func SendMessage(bot *tgbotapi.BotAPI, reminder Reminder) {
 		tgbotapi.NewMessage(
 			reminder.ChatId,
 			fmt.Sprintf(
-				"Ok, will notify you in %.1f hours",
+				"Ok, will notify you in %.1f hours, master",
 				time.Until(t).Hours(),
 			),
 		),
@@ -80,10 +83,22 @@ func SendMessage(bot *tgbotapi.BotAPI, reminder Reminder) {
 }
 
 func telegramBot(bot *tgbotapi.BotAPI) {
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
 
-	updates, _ := bot.GetUpdatesChan(u)
+	_, err := bot.SetWebhook(tgbotapi.NewWebhook(
+		os.Getenv("DOMAIN") + PORT + "/" + bot.Token,
+	))
+	if err != nil {
+		log.Fatal(err)
+	}
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if info.LastErrorDate != 0 {
+		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
+	}
+	updates := bot.ListenForWebhook("/" + bot.Token)
+	go http.ListenAndServe("0.0.0.0:8443", nil)
 
 	for update := range updates {
 		if update.Message == nil {
