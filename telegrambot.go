@@ -16,7 +16,6 @@ Send this command with reply of message.
 Expected usage of this command: /store {day [1-7]} {class [1-7]}.
 For example: /store 1 2 (Set reply message on Monday at 2 class).
 `
-const PORT = "8443"
 
 func getClassTimeReminder(class int) (int, int) {
 	switch class {
@@ -85,7 +84,7 @@ func SendMessage(bot *tgbotapi.BotAPI, reminder Reminder) {
 func telegramBot(bot *tgbotapi.BotAPI) {
 
 	_, err := bot.SetWebhook(tgbotapi.NewWebhook(
-		os.Getenv("DOMAIN") + PORT + "/" + bot.Token,
+		os.Getenv("DOMAIN") + os.Getenv("PORT") + "/" + bot.Token,
 	))
 	if err != nil {
 		log.Fatal(err)
@@ -98,7 +97,7 @@ func telegramBot(bot *tgbotapi.BotAPI) {
 		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServe("0.0.0.0:8443", nil)
+	go http.ListenAndServe("0.0.0.0:"+os.Getenv("PORT"), nil)
 
 	for update := range updates {
 		if update.Message == nil {
