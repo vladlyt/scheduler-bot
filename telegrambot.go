@@ -149,10 +149,13 @@ func runTelegramBot(bot *tgbotapi.BotAPI) {
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServe("0.0.0.0:"+os.Getenv("PORT"), nil)
 
+	fmt.Println("Started server")
+
 	for update := range updates {
 		if update.Message == nil {
 			continue
 		}
+		fmt.Println("New message", update.Message.Text)
 		if update.Message.IsCommand() {
 			switch update.Message.Command() {
 			case "store":
